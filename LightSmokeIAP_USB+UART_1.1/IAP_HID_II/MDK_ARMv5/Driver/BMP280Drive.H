@@ -75,17 +75,6 @@ typedef unsigned short WORD;
 #define TP4056_STDBY_PORT   HT_GPIOB
 #define TP4056_STDBY_PIN    GPIO_PIN_4
 
-
-#define LED_RED_PORT    (HT_GPIOC)
-#define LED_RED_PIN     GPIO_PIN_3
-#define LED_GREEN_PORT    (HT_GPIOC)
-#define LED_GREEN_PIN     GPIO_PIN_1
-#define LED_BLUE_PORT    (HT_GPIOC)
-#define LED_BLUE_PIN     GPIO_PIN_2
-
-#define LED_VCC_EN_PORT     (HT_GPIOA)
-#define LED_VCC_EN_PIN     (GPIO_PIN_14)
-
 typedef struct __BMP180
 {
 	short AC1;
@@ -115,6 +104,7 @@ typedef struct __BMP180
 }_bmp180;
 
 extern _bmp180 bmp180;
+extern u8 EnPressFlag;
 
 void BMP_Init(void);
 uint8_t BMP_ReadOneByte(uint8_t ReadAddr);
@@ -140,5 +130,6 @@ int	bmp280_init(void);
 void Init_BMP280(void);
 void GetPressure(void);
 long bmp280Convert(void);
+long Multiple_three_read(unsigned char ST_Address);
 #endif // MSD_H_INCLUDED
 

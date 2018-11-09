@@ -506,11 +506,6 @@
               <FilePath>..\Driver\buffer.c</FilePath>
             </File>
             <File>
-              <FileName>timebase_bftm.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Src_AP\timebase_bftm.c</FilePath>
-            </File>
-            <File>
               <FileName>ap_uart_handler.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Src_AP\ap_uart_handler.c</FilePath>
@@ -521,24 +516,69 @@
               <FilePath>.\APP\AirPress.c</FilePath>
             </File>
             <File>
-              <FileName>KeyLed.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\APP\KeyLed.c</FilePath>
-            </File>
-            <File>
               <FileName>LEDColorRdy.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\APP\LEDColorRdy.c</FilePath>
             </File>
             <File>
-              <FileName>LEDDisp.c</FileName>
+              <FileName>KeyLed.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\APP\LEDDisp.c</FilePath>
+              <FilePath>.\APP\KeyLed.c</FilePath>
             </File>
             <File>
               <FileName>LEDRGBEncode.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\APP\LEDRGBEncode.c</FilePath>
+            </File>
+            <File>
+              <FileName>TaskKey.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\APP\TaskKey.c</FilePath>
+            </File>
+            <File>
+              <FileName>TaskADC.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\APP\TaskADC.c</FilePath>
+            </File>
+            <File>
+              <FileName>TaskBLE.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\APP\TaskBLE.c</FilePath>
+            </File>
+            <File>
+              <FileName>TaskLEDLine.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\APP\TaskLEDLine.c</FilePath>
+            </File>
+            <File>
+              <FileName>BatManage.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\APP\BatManage.c</FilePath>
+            </File>
+            <File>
+              <FileName>TaskSleep.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\APP\TaskSleep.c</FilePath>
+            </File>
+            <File>
+              <FileName>version.txt</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\version.txt</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>USER_Drive</GroupName>
+          <Files>
+            <File>
+              <FileName>ADCDrive.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Driver\ADCDrive.c</FilePath>
+            </File>
+            <File>
+              <FileName>timebase_bftm.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src_AP\timebase_bftm.c</FilePath>
             </File>
             <File>
               <FileName>BMP280Drive.c</FileName>
@@ -569,11 +609,6 @@
               <FileName>USART0Drive.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\Driver\USART0Drive.c</FilePath>
-            </File>
-            <File>
-              <FileName>ADCDrive.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\Driver\ADCDrive.c</FilePath>
             </File>
           </Files>
         </Group>

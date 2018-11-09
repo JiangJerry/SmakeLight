@@ -2,9 +2,7 @@
 #define __UART0_H
 #define BRAND (9600)
 
-#define USART_BUFSIZE (4)
 
-#define USART_TXSIZE (13)
 
 #define HTCFG_USART_TX_GPIO_ID                          (GPIO_PA)
 #define HTCFG_USART_RX_GPIO_ID                          (GPIO_PA)
@@ -38,4 +36,6 @@
 #define REC_DATA_SIZE1		    4		//
 #define REC_DATA_CTX		    5		//?車那?﹞⊿?赤那y?Y?迆豕Y
 #define REC_END                 6       //?芍那??車那?
+
+
 #endif

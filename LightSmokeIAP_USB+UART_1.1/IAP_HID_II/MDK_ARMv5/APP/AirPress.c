@@ -36,10 +36,15 @@ short dig_P9;
 
 //**************************************************************
 //初始化BMP280，根据需要请参考pdf进行修改**************
-	unsigned short temp = 0;
-void Init_BMP280(void)
+unsigned short temp = 0;
+void AirPressInit(void)
 {
-
+    /* Configure GPIO direction of output pins                                                                */
+    AFIO_GPxConfig(GPIO_PB, SCK_PIN, AFIO_MODE_DEFAULT);
+    AFIO_GPxConfig(GPIO_PB, SDA_PIN, AFIO_MODE_DEFAULT);
+    GPIO_DirectionConfig(SCK_PORT, SCK_PIN, GPIO_DIR_OUT);
+    GPIO_DirectionConfig(SDA_PORT, SDA_PIN, GPIO_DIR_OUT);
+    
     while(temp != 0X58)
     {    
         temp = BMP_ReadOneByte(0xd0);//读取id、判断iic是否正常模块是否正常，读取出来的地址是0x58就是对的
@@ -63,13 +68,16 @@ void Init_BMP280(void)
 //	write_byte = 0x00;//配置
 	BMP_WriteOneByte(0xf5,0X80);//5<<2
 	GetInitPressure();//获取初始值
-//	Delay_N1ms(200);	
+//	Delay_N1ms(200);
+	EnPressFlag = 1;
+	
 }
 //***********************************************************************
 
 long adc_T;
 long adc_P;
-long var1, var2,t_fine,T,p; 
+long var1, var2,t_fine,T,p;
+
 long bmp280Convert(void)
 {
 	adc_T = Multiple_three_read(0xFA);    // 读取温度
@@ -168,20 +176,16 @@ void GetPressure(void)
 		if(PressSumInitValu > PressCurrent)
 		{
 			PressDn = PressSumInitValu - PressCurrent;
-			if((PressDn > 20)&&(PressDnFlag == 0))	//设置气压标志，备份变化前的数据
+			if((PressDn > 10)&&(PressDnFlag == 0)&&(EnPressFlag == 1))	//设置气压标志，备份变化前的数据,并且气压检测传感器打开
 			{
 				PressDnFlag = 1;
-				ColorRadioDnBak();
+				ColorRadioDnBak();  //记录当前光亮度，用于渐暗渐亮
 			}
 		}
 		else
-		{
-			
+		{		
 			PressDn = 0;
 		}
-		while (!USART_GetFlagStatus(HTCFG_USART, USART_FLAG_TXC));
-		USART_SendData(HTCFG_USART, PressDn);    
-		
         PressSum = 0;
         PressCnt = 0;
 	}   

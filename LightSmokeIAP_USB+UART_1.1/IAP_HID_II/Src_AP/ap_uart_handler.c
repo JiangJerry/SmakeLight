@@ -38,6 +38,8 @@
 #include "ap_crc16.h"
 #include "rough_delay.h"
 #include "timebase.h"
+#include "USART0Drive.h"
+
 
 /* Private typedef -----------------------------------------------------------------------------------------*/
 typedef u32 (*pFunction)();

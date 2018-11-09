@@ -56,9 +56,10 @@ static u32 LedFlag = 0;
  * @brief   This function handles SysTick Handler.
  * @retval  None,20ms中断一次
  ************************************************************************************************************/
-extern u8 TaskLEDRdy,TaskKeyRdy,TaskLEDUpdate,Duty,TaskADCRdy;
+extern u8 TaskLEDLineRdy,TaskKeyRdy,TaskLEDUpdate,Duty,TaskADCRdy,TaskBLERdy,EnterSleepDly;
 extern u16 DlySet,DlyTime;
 u8 LowBatFlag = 0;
+extern FlagStatus TaskSleepRdy,EnterSleepPreFlag;
 
 u8 SFlag = 0;;
 #define COUNT_1S    100  
@@ -70,22 +71,18 @@ void SysTick_Handler(void)
     static u16 CntFor1s = 0;
 	static u8 CntLEDScan = 0;
 	static u8 DutyScnt = 0;
-	static u8 Temp = 0,Flag;
+	static u8 Flag;
     
     AP_TimebaseHandler();
     if(CntFor1s++ >= COUNT_1S)
     {
         CntFor1s = 0;
         TaskADCRdy = 1;
-        if(DlyTime > 0) //模式灯显示时间递减
+        if((DlyTime > 0)&&(DlySet != 0xff)&&(LedMode != LED_ALTER)) //模式灯显示时间递减
         {
-//            DlyTime--;
+            DlyTime--;
         }        
-		if(Temp++ > 100)
-			Temp = 0;
-
         BatSta = NOSTATUS;
-        
         if(ChargeFlag == SET)
         {
             ChargeFlag = RESET;
@@ -93,22 +90,23 @@ void SysTick_Handler(void)
         }
         if(StdbyFlag == SET)
         {
-            StdbyFlag = RESET;
-            
+            StdbyFlag = RESET;           
             BatSta = STDBY;         //充电状态
         }    
         if(LowBatFlag == 1)         //检测是否底电压，亮红灯
         {
             BatSta = LOWBAT;        //底电压状态
         }
-        
+        if(EnterSleepPreFlag == SET)
+            EnterSleepDly++;
+        else
+            EnterSleepDly = 0;
     }
 	CntLEDScan++;
-//	if(CntLEDScan >= 4)	//客户要求的扫描时间
 	if(CntLEDScan >= 4)	//客户要求的扫描时间
 	{
 		SFlag = 1;
-		TaskLEDRdy = 1; //LED扫描任务就绪
+		TaskLEDLineRdy = 1; //LED扫描任务就绪
 		CntLEDScan = 0;
 		DutyScnt++;
 		if(Duty > 60)
@@ -151,6 +149,7 @@ void SysTick_Handler(void)
 		}
 	}
     TaskKeyRdy = 1; //按键扫描任务就绪
+    TaskBLERdy = 1;
   //HT32F_DVB_LEDToggle((LED_TypeDef)(LedFlag % 1));
   //LedFlag++;
 }
@@ -163,25 +162,6 @@ void USB_IRQHandler(void)
 {
     __ALIGN4 extern USBDCore_TypeDef gUSBCore;
     USBDCore_IRQHandler(&gUSBCore);
-}
-u8 WakeUpType = 0;
-void EVWUP_IRQHandler(void)
-{
-    static u8 Flag = 0;
-    u32 wRtcCounterTmp = 0;
-     
-    if (EXTI_GetWakeupFlagStatus(DC_CHRG_EXTI_CHANNEL))
-    {
-        EXTI_WakeupEventConfig(DC_CHRG_EXTI_CHANNEL, EXTI_WAKEUP_LOW_LEVEL, DISABLE);
-        EXTI_ClearWakeupFlag(DC_CHRG_EXTI_CHANNEL);
-        WakeUpType = 1;    
-    }  
-    if (EXTI_GetWakeupFlagStatus(WAKEUP_BUTTON_EXTI_CHANNEL))
-    {
-        EXTI_WakeupEventConfig(WAKEUP_BUTTON_EXTI_CHANNEL, EXTI_WAKEUP_HIGH_LEVEL, DISABLE);
-        EXTI_ClearWakeupFlag(WAKEUP_BUTTON_EXTI_CHANNEL);
-        WakeUpType = 2;    
-    }         
 }
 
 #define LOW_BAT 2171    //3.5V
@@ -222,11 +202,11 @@ void ADC_IRQHandler(void)
  ************************************************************************************************************/
 void RTC_IRQHandler(void)
 {
-  extern vu32 gwTimeDisplay;
+    extern vu32 gwTimeDisplay;
     static u8 Flag = 0;
-  u8 bFlags;
+    u8 bFlags;
 
-  bFlags = RTC_GetFlagStatus();
+    bFlags = RTC_GetFlagStatus();
 //  if((bFlags & 0x2) != 0x0) /* Match flag */
 //  {
 //    /* Reset RTC init time when Time is 23:59:59 */

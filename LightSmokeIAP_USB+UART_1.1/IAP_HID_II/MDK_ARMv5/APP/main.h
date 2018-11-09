@@ -66,11 +66,11 @@ extern Communicate APPFrame;
 #define LED_MODE5   4
 #define LED_MODE6   5
 
-#define LED_ALTER   15
+#define LED_ALTER       15
 
-#define CONFIG_IN_NUM 1
+#define CONFIG_IN_NUM   1
 
-#define EN_PRESS_FUNC   0
+#define EN_PRESS_FUNC   1
 
 /* Exported functions --------------------------------------------------------------------------------------*/
 void NVIC_Configuration(void);
@@ -96,26 +96,24 @@ void ModifyColorTable4(void);
 void ModifyColorTable5(void);
 void ModifyColorTable6(void);    
 void GetKey(void);
-void Init_BMP280(void);  //初始化气压温度传感器
-void LEDInit(void);
 void AckDataToBleModle(void);
 void LEDModeDatePre(u8 DutyData);
 void ColorRadioDnBak(void);
 void PressBrightAdj(u8 PressData);
-void GetInitPressure(void);
-void GetPressure(void);
 void ModityDnUpTable(void);
 void WaitWakeUpKeyReset(void);
 void AP_TimebaseHandler(void);
 void ADCInit(void);
 void ADCStart(void);
 void ADCStop(void);
-void ADCEnable();
-void ADCDisable();
+void ADCEnable(void);
+void ADCDisable(void);
 
-void LEDVCCClose(void);
-void LEDVCCOpen(void);
 
+void TaskKey(void);
+void TaskADC(void);
+void TaskLEDLine(void);
+void EnterSleep(void);
 
 FlagStatus GetCHRGSta(void);
 FlagStatus GetSTDBYSta(void);
@@ -127,6 +125,16 @@ void BatLedGreen(void);
 void BatLedRed(void);
 
 void BatLedOff(void);
+
+#include "Sleep.h"
+#include "AirPress.h"
+#include "LedLine.h"
+#include "BatManage.h"
+#include "TaskLEDLine.h"
+#include "TaskBLE.h"
+#include "TaskLEDLine.h"
+#include "KeyInput.h"
+
 #ifdef __cplusplus
 }
 #endif

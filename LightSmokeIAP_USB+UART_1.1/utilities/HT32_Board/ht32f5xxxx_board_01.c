@@ -254,8 +254,7 @@ void HT32F_DVB_PBInit(BUTTON_TypeDef BUTTON_x, BUTTON_MODE_TypeDef BUTTON_MODE_x
     EXTI_InitStruct.EXTI_Debounce = EXTI_DEBOUNCE_DISABLE;
     EXTI_InitStruct.EXTI_DebounceCnt = 0;
     EXTI_InitStruct.EXTI_IntType = (BUTTON_x == BUTTON_WAKEUP) ?  EXTI_NEGATIVE_EDGE: EXTI_POSITIVE_EDGE;
-    
-    
+     
     EXTI_Init(&EXTI_InitStruct);
 
     /* Enable Button EXTI Interrupt                                                                         */
@@ -265,16 +264,16 @@ void HT32F_DVB_PBInit(BUTTON_TypeDef BUTTON_x, BUTTON_MODE_TypeDef BUTTON_MODE_x
       case 0:
       case 1:
         NVIC_EnableIRQ(EXTI0_1_IRQn);
-    NVIC_SetPriority(EXTI0_1_IRQn, 0xF);    
+        NVIC_SetPriority(EXTI0_1_IRQn, 0xF);    
         break;
       case 2:
       case 3:
         NVIC_EnableIRQ(EXTI2_3_IRQn);
-    NVIC_SetPriority(EXTI2_3_IRQn, 0xF);    
+        NVIC_SetPriority(EXTI2_3_IRQn, 0xF);    
         break;
       default:
         NVIC_EnableIRQ(EXTI4_15_IRQn);
-    NVIC_SetPriority(EXTI4_15_IRQn, 0xF);    
+        NVIC_SetPriority(EXTI4_15_IRQn, 0xF);    
         break;
     }
   }

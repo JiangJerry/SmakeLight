@@ -37,7 +37,6 @@
 
 #include "ap_uart_handler.h"
 
-
 #include "main.h"
 #include "USART0Drive.h"
 
@@ -76,141 +75,47 @@ vu32 gParameter;
 vu32 gParameterShadow = 1;
 vu32 gTimebaseDownCnt;
 
-u32 u32_test;
-
-/*********************************************************************************************************//**
-  * @brief  Configures RTC clock source and prescaler.
-  * @retval None
-  * @details The RTC configuration as following:
-  *   - Check the backup domain(RTC & PWRCU) is ready for access.
-  *   - Reset Backup Domain.
-  *   - Enable the LSE OSC and wait till LSE is ready.
-  *   - Select the RTC Clock Source as LSE.
-  *   - Set the RTC time base to 1 second.
-  *   - Set Compare value.
-  *   - Enable the RTC.
-  *   - Enable the RTC Compare Match wakeup event.
-  *
-  ***********************************************************************************************************/
-void RTC_Configuration(void)
-{
-#ifndef USE_HT32F52230_SK
-  /* Check the backup domain(RTC & PWRCU) is ready for access                                               */
-    #if (!LIBCFG_NO_PWRCU_TEST_REG)
-    if (PWRCU_CheckReadyAccessed() != PWRCU_OK)
-    {
-      while (1);
-    }
-    #endif
-  /* Reset Backup Domain                                                                                    */
-  PWRCU_DeInit();
-
-  /* Enable the LSE OSC                                                                                     */
-  RTC_LSESMConfig(RTC_LSESM_NORMAL);
-//  RTC_LSECmd(ENABLE);
-  /* Wait till LSE is ready                                                                                 */
-  while (CKCU_GetClockReadyStatus(CKCU_FLAG_LSIRDY) == RESET);
-
-  /* Select the RTC Clock Source as LSE                                                                     */
-  RTC_ClockSourceConfig(RTC_SRC_LSI);
-
-  /* Set the RTC time base to 1s                                                                            */
-  RTC_SetPrescaler(RTC_RPRE_32768);
-
-  /* Set Compare value                                                                                      */
-  RTC_SetCompare(0xFF);
-
-  /* Enable the RTC                                                                                         */
-  RTC_Cmd(ENABLE);
-
-  /* Enable the RTC Compare Match wakeup event                                                              */
-  RTC_WakeupConfig(RTC_WAKEUP_CM, ENABLE);
-#endif
-}
-
-/* Global functions ----------------------------------------------------------------------------------------*/
-extern void EnterSleep();
-
-/*********************************************************************************************************//**
-  * @brief  Main program.
-  * @retval None
-  ***********************************************************************************************************/
+/*********************************************************************************************************
+** 函数名称: main
+** 功能描述: 主函数
+** 输　入: 	 无
+** 输　出 :  无
+** 全局变量: 无							  
+** 调用模块: 无
+********************************************************************************************************/
 int main(void)
 {
-    NVIC_SetVectorTable(NVIC_VECTTABLE_FLASH, IAP_APFLASH_START);     // Set the Vector Table Offset
-
-    CKCU_Configuration();               // System Related configuration
-
-    SYSTICK_SetReloadValue(SystemCoreClock / 8/ 2/ 50);      /* (CK_SYS/8/2/50) = 10ms                             */
-    SYSTICK_IntConfig(ENABLE);                            /* Enable SYSTICK Interrupt                         */
+    NVIC_SetVectorTable(NVIC_VECTTABLE_FLASH, IAP_APFLASH_START);   // Set the Vector Table Offset
+    CKCU_Configuration();                                           // System Related configuration
+    SYSTICK_SetReloadValue(SystemCoreClock / 8/ 2/ 50);             // (CK_SYS/8/2/50) = 10ms  
+    SYSTICK_IntConfig(ENABLE);                                      // Enable SYSTICK Interrupt 
     SYSTICK_CounterCmd(SYSTICK_COUNTER_CLEAR);
     SYSTICK_CounterCmd(SYSTICK_COUNTER_ENABLE);
-
-	USBD_Configuration();               /* USB device configuration                                           */	
-    AP_Init();      //应用程序初始化
-    AP_Uart_Init();
-    ADCInit();        
-    KeyIoInit();    //按键IO初始化
-
+	USBD_Configuration();   //USB模块初始化
+    AP_Init();              //应用程序初始化
+    AP_Uart_Init();         //串口初始化
+    ADCInit();              //ADC初始化
+    BatManageInit();        //电池管理初始化
+    KeyIoInit();            //按键IO初始化
 #if EN_PRESS_FUNC > 0    
-    Init_BMP280();  //初始化气压温度传感器
+    AirPressInit();         //初始化气压温度传感器
 #endif
-    LEDInit();      //LED灯带数据初始化
-    
-    /* Configure RTC clock source and prescaler                                                               */
-    RTC_Configuration();
-
-    /* Enable and set EXTI Event Wakeup interrupt to the lowest priority                                      */
-    NVIC_SetPriority(EVWUP_IRQn, 0xF);
-    NVIC_EnableIRQ(EVWUP_IRQn);
-    EXTI_WakeupEventIntConfig(ENABLE);
-    
+    LEDLineInit();          //LED灯带数据初始化 
+    WakeUpSleepInit();      //睡眠模式1唤醒初始化
     while (1)                          
     {          
-        USBDCore_MainRoutine(&gUSBCore);
-        AP_Uart_Handler();
-        LEDDisp();
-        WDT_Restart();                    // Reload Counter as WDTV Value        
+        USBDCore_MainRoutine(&gUSBCore);    //USB升级
+        AP_Uart_Handler();                  //串口升级及回调函数
+        TaskADC();
+        TaskKey(); 
+        TaskBLE();
+        TaskLEDLine();
+        TaskSleep();
+        WDT_Restart();
     }
 }
 
   
-//int main(void)
-//{
-//  NVIC_SetVectorTable(NVIC_VECTTABLE_FLASH, IAP_APFLASH_START);     /* Set the Vector Table Offset          */
-
-//  CKCU_Configuration();               /* System Related configuration                                       */
-
-//  //RETARGET_Configuration();           /* Retarget Related configuration                                     */
-
-//  SYSTICK_ClockSourceConfig(SYSTICK_SRC_STCLK);         /* Default : CK_SYS/8                               */
-//  SYSTICK_SetReloadValue(SystemCoreClock / 8 / 2 / 2);      /* (CK_SYS/8/2) = 500ms                             */
-//  SYSTICK_IntConfig(ENABLE);                            /* Enable SYSTICK Interrupt                         */
-//  SYSTICK_CounterCmd(SYSTICK_COUNTER_CLEAR);
-//  SYSTICK_CounterCmd(SYSTICK_COUNTER_ENABLE);
-//  
-//  GPIO_DirectionConfig(HT_GPIOA, GPIO_PIN_0|GPIO_PIN_1, GPIO_DIR_OUT); 
-//  GPIO_ClearOutBits(HT_GPIOA, GPIO_PIN_0|GPIO_PIN_1);
-//    
-//  USBD_Configuration();               /* USB device configuration                                           */	
-//  AP_Init();
-//  AP_Uart_Init();
-//  
-//  while (1)                           /* Infinite loop                                                      */
-//  {    
-//    USBDCore_MainRoutine(&gUSBCore);
-//    AP_Uart_Handler();
-//    
-//    //------TEST----------
-//    u32_test++;
-//    //if(u32_test&0x04) GPIO_ClearOutBits(HT_GPIOA, GPIO_PIN_0);
-//    //else GPIO_SetOutBits(HT_GPIOA, GPIO_PIN_0);
-//    
-//    if(u32_test&0x04) GPIO_ClearOutBits(HT_GPIOA, GPIO_PIN_1);
-//    else GPIO_SetOutBits(HT_GPIOA, GPIO_PIN_1);
-//    //------TEST END------
-//  }
-//}
 
 /*********************************************************************************************************//**
   * @brief  Show Test menu.
@@ -408,19 +313,3 @@ void assert_error(u8* filename, u32 uline)
 }
 #endif
 
-
-/**
-  * @}
-  */
-
-/**
-  * @}
-  */
-
-/**
-  * @}
-  */
-
-/**
-  * @}
-  */
