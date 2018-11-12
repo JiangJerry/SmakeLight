@@ -34,7 +34,7 @@
 #include <string.h>
 #include "ap_uart_handler.h"
 #include "uart.h"
-
+#include "main.h"
 #include "ap_crc16.h"
 #include "rough_delay.h"
 #include "timebase.h"
@@ -91,7 +91,7 @@ static u32 AP_GetBootMode(void);
 static u8 CalculateHeaderCheckSum(u8* pCmdBuffer);
 static void AdjustReturnPackage(u8* pBuf, u8 length);
 static void ParseCmd(void);
-
+extern void APPFrameRxCallBack(u8 RxBuf);
 #if (USER_CMD_COUNT > 0)  
 static u32 AP_User_Cmd(u32 uPar0, u32 uPar1, u32 uPar2);
 #endif
@@ -134,11 +134,13 @@ static const pFunction pFComHandlerTable[CMD_COUNT] =
   * @brief  AP mode initialization.
   * @retval None
   ***********************************************************************************************************/
+
 void AP_Uart_Init(void)
 {
     IAP_UART_Init();  
 //    Timebase_Init();
 //    Timebase_InterruptCmd(ENABLE);
+	APPFrame.RecSta = REC_INIT;
 }
 
 /*********************************************************************************************************//**

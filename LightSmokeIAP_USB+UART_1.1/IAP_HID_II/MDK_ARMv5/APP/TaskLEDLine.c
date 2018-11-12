@@ -54,8 +54,6 @@ void LEDALLOff(void)
 void LEDModeDatePre(u8 DutyData)
 {
 	u8 i;
-	LED_RGB_Data_TypeDef *PtrCurrent;
-	PtrCurrent = &LEDLightAllBuffer[0];
 	
     switch(LedMode)
     {
@@ -154,9 +152,8 @@ extern FlagStatus TaskSleepRdy;
 void TaskLEDLine(void)
 {
 	
-    static u8 AlterBrighss = 100,AlterTimes = 0,LedModeBak,Flag;
-    u8 i,NextDataIndex,NextOutputTab,LEDTIndex;
-    float Temp = 0;
+    static u8 AlterBrighss = 100,AlterTimes = 0,LedModeBak;
+    u8 NextDataIndex,NextOutputTab,LEDTIndex;
     
     if(TaskLEDLineRdy)
     {

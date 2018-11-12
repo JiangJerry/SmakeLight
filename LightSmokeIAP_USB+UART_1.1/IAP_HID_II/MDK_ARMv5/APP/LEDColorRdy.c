@@ -164,7 +164,7 @@ void ColorDataRdy5(u8 Ratio)
     };  
 
     LED_RGB_Data_TypeDef   *BufferPtr;
-    LED_RGB_Data_TypeDef  Temp[2];
+    LED_RGB_Data_TypeDef  Temp[4];
     u8 *Ptr, *TempPtr;
     Ptr = &LEDType5[0].uRed;
     TempPtr = &Temp[0].uRed;
@@ -225,7 +225,7 @@ void ColorDataRdy2(u8 Ratio)
         {        0,          0,     0xff},   //À¶  
     };  
     LED_RGB_Data_TypeDef   *BufferPtr;
-    LED_RGB_Data_TypeDef  Temp[2];
+    LED_RGB_Data_TypeDef  Temp[4];
     u8 *Ptr, *TempPtr;
     Ptr = &LEDType4[0].uRed;
     TempPtr = &Temp[0].uRed;

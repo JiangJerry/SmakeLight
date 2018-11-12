@@ -68,10 +68,10 @@ extern Communicate APPFrame;
 
 #define LED_ALTER       15
 
-#define CONFIG_IN_NUM   1
+#define CONFIG_IN_NUM   	1	//按键数量
 
-#define EN_PRESS_FUNC   1
-
+#define EN_PRESS_FUNC   	1	//允许压力传感器有效
+#define EN_PRESS_VALU_OUT	0	//允许压力传感器数据输出
 /* Exported functions --------------------------------------------------------------------------------------*/
 void NVIC_Configuration(void);
 void CKCU_Configuration(void);

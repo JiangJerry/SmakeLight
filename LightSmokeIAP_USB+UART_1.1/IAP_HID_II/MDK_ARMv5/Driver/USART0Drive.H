@@ -1,8 +1,5 @@
 #ifndef __UART0_H
 #define __UART0_H
-#define BRAND (9600)
-
-
 
 #define HTCFG_USART_TX_GPIO_ID                          (GPIO_PA)
 #define HTCFG_USART_RX_GPIO_ID                          (GPIO_PA)

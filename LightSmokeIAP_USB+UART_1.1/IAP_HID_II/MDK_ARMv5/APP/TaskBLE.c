@@ -16,7 +16,7 @@ u8 TaskBLERdy;
 #define HEAD1   0X15
 
 extern u8 TaskLEDRdy,LedMode,i,Duty,EnPressFlag,ShutDownFlag,AlertFlag;
-void USART_Tx(const char* TxBuffer, u32 length);
+void USART_Tx(char* TxBuffer, u32 length);
 unsigned char UR0TxBuf[USART_TXSIZE];
 
 

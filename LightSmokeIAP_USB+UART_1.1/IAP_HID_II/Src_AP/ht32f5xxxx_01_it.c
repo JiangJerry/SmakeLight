@@ -31,27 +31,7 @@
 #include "ht32_usbd_core.h"
 #include "main.h"
 #include "BMP280Drive.h"
-/** @addtogroup HT32_Series_Peripheral_Examples HT32 Peripheral Examples
-  * @{
-  */
 
-/** @addtogroup IAP_HID IAP HID
-  * @{
-  */
-
-/** @addtogroup IAP_HID_II IAP HID II (with USB Check buffer)
-  * @{
-  */
-
-/** @addtogroup IAP_HID_II_AP AP Example
-  * @{
-  */
-
-
-/* Private variables ---------------------------------------------------------------------------------------*/
-static u32 LedFlag = 0;
-
-/* Global functions ----------------------------------------------------------------------------------------*/
 /*********************************************************************************************************//**
  * @brief   This function handles SysTick Handler.
  * @retval  None,20msÖÐ¶ÏÒ»´Î
@@ -71,7 +51,6 @@ void SysTick_Handler(void)
     static u16 CntFor1s = 0;
 	static u8 CntLEDScan = 0;
 	static u8 DutyScnt = 0;
-	static u8 Flag;
     
     AP_TimebaseHandler();
     if(CntFor1s++ >= COUNT_1S)

@@ -32,31 +32,13 @@
 #include "ht32_usbd_core.h"
 #include "ht32_usbd_class.h"
 #include "ht32_usbd_descriptor.h"
+#include "main.h"
 #include "ap_handler.h"
 #include "ap_config.h"
 
 #include "ap_uart_handler.h"
 
-#include "main.h"
 #include "USART0Drive.h"
-
-
-/** @addtogroup HT32_Series_Peripheral_Examples HT32 Peripheral Examples
-  * @{
-  */
-
-/** @addtogroup IAP_HID IAP HID
-  * @{
-  */
-
-/** @addtogroup IAP_HID_II IAP HID II (with USB Check buffer)
-  * @{
-  */
-
-/** @addtogroup IAP_HID_II_AP AP Example
-  * @{
-  */
-
 
 /* Private function prototypes -----------------------------------------------------------------------------*/
 void CKCU_Configuration(void);

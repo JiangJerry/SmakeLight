@@ -3,7 +3,6 @@
 #include "main.h"
 #include "BMP280Drive.h"
 
-
 u8 TaskKeyRdy;
 extern FlagStatus EnterSleepPreFlag;
 

@@ -18,6 +18,7 @@ _bmp180 bmp180;
 
 long PressSum = 0,PressCnt = 0,PressCurrent;
 extern u8 DutyBak,Duty,EnPressFlag;
+long PressSumInitValu;
 
 u8 PressDn;
 
@@ -36,9 +37,9 @@ short dig_P9;
 
 //**************************************************************
 //初始化BMP280，根据需要请参考pdf进行修改**************
-unsigned short temp = 0;
 void AirPressInit(void)
 {
+	unsigned short temp = 0;
     /* Configure GPIO direction of output pins                                                                */
     AFIO_GPxConfig(GPIO_PB, SCK_PIN, AFIO_MODE_DEFAULT);
     AFIO_GPxConfig(GPIO_PB, SDA_PIN, AFIO_MODE_DEFAULT);
@@ -62,13 +63,11 @@ void AirPressInit(void)
 	dig_P8 = BMP_ReadTwoByte(0x9C);
 	dig_P9 = BMP_ReadTwoByte(0x9E);
 
-
-
-	BMP_WriteOneByte(0xf4,0xff);
-//	write_byte = 0x00;//配置
-	BMP_WriteOneByte(0xf5,0X80);//5<<2
+	BMP_WriteOneByte(0xe0,0xb6);	//复位
+	BMP_WriteOneByte(0xf4,0xff);	//设置采集精度
+	//t_sb[7-5]:000 0.5ms转换一次 filter[4-2] 111 
+	BMP_WriteOneByte(0xf5,0X1c);	//设置滤波值
 	GetInitPressure();//获取初始值
-//	Delay_N1ms(200);
 	EnPressFlag = 1;
 	
 }
@@ -88,35 +87,21 @@ long bmp280Convert(void)
 	}
 	//Temperature
 	var1 = (((double)adc_T)/16384.0-((double)dig_T1)/1024.0)*((double)dig_T2);
-	var2 = ((((double)adc_T)/131072.0-((double)dig_T1)/8192.0)*(((double)adc_T)/131072.0-((double)dig_T1)/8192.0))*((double)dig_T3);
-	
-	t_fine = (u32)(var1+var2);
-	
+	var2 = ((((double)adc_T)/131072.0-((double)dig_T1)/8192.0)*(((double)adc_T)/131072.0-((double)dig_T1)/8192.0))*((double)dig_T3);	
+	t_fine = (u32)(var1+var2);	
 	T = (var1+var2)/5120.0;
-	T = T;
-	
-	var1 = ((double)t_fine/2.0)-64000.0;
-	
-	var2 = var1*var1*((double)dig_P6)/32768.0;
-	
-	var2 = var2+var1*((double)dig_P5)*2.0;
-	
-	var2 = (var2/4.0)+(((double)dig_P4)*65536.0);
-	
-	var1 = (((double)dig_P3)*var1*var1/524288.0+((double)dig_P2)*var1)/524288.0;
-	
-	var1 = (1.0+var1/32768.0)*((double)dig_P1);
-	
+	T = T;	
+	var1 = ((double)t_fine/2.0)-64000.0;	
+	var2 = var1*var1*((double)dig_P6)/32768.0;	
+	var2 = var2+var1*((double)dig_P5)*2.0;	
+	var2 = (var2/4.0)+(((double)dig_P4)*65536.0);	
+	var1 = (((double)dig_P3)*var1*var1/524288.0+((double)dig_P2)*var1)/524288.0;	
+	var1 = (1.0+var1/32768.0)*((double)dig_P1);	
 	p = 1048576.0-(double)adc_P;
-
-	p = (p-(var2/4096.0))*6250.0/var1;
-	
-	var1 = ((double)dig_P9)*p*p/2147483648.0;
-	
-	var2 = p*((double)dig_P8)/32768.0;
-	
-	p = p+(var1+var2+((double)dig_P7))/16.0;
-	 
+	p = (p-(var2/4096.0))*6250.0/var1;	
+	var1 = ((double)dig_P9)*p*p/2147483648.0;	
+	var2 = p*((double)dig_P8)/32768.0;	
+	p = p+(var1+var2+((double)dig_P7))/16.0;	 
 	return p;
 }
 
@@ -156,27 +141,35 @@ void Del1Out(void)
 	while (!USART_GetFlagStatus(HTCFG_USART, USART_FLAG_TXC));
 	USART_SendData(HTCFG_USART, 0xa2); 
 	PressSum = PressSum>>4;    
+	
 	while (!USART_GetFlagStatus(HTCFG_USART, USART_FLAG_TXC));
-	USART_SendData(HTCFG_USART, ((PressSum>>8)&0xff));    
+	USART_SendData(HTCFG_USART, ((PressSumInitValu>>8)&0xff));    
 	while (!USART_GetFlagStatus(HTCFG_USART, USART_FLAG_TXC));
-	USART_SendData(HTCFG_USART, ((PressSum)&0xff));    	
+	USART_SendData(HTCFG_USART, ((PressSumInitValu)&0xff)); 
+
+	while (!USART_GetFlagStatus(HTCFG_USART, USART_FLAG_TXC));
+	USART_SendData(HTCFG_USART, ((PressCurrent>>8)&0xff));    
+	while (!USART_GetFlagStatus(HTCFG_USART, USART_FLAG_TXC));
+	USART_SendData(HTCFG_USART, ((PressCurrent)&0xff)); 
+
+   	
 }
-long PressSumInitValu;
 u8 PressDnFlag = 0;
 void GetPressure(void)
 { 	
-	u8 PressValu;
     PressSum = PressSum + bmp280Convert();   
     PressCnt++;
     if(PressCnt >= 10)  //10次平均值        
     {
 		PressCurrent = (PressSum/10);
 		PressCurrent = PressCurrent>>4;//去掉4位精度
-//		Del1Out();
+#if EN_PRESS_VALU_OUT > 0		
+		Del1Out();
+#endif		
 		if(PressSumInitValu > PressCurrent)
 		{
 			PressDn = PressSumInitValu - PressCurrent;
-			if((PressDn > 10)&&(PressDnFlag == 0)&&(EnPressFlag == 1))	//设置气压标志，备份变化前的数据,并且气压检测传感器打开
+			if((PressDn > AIR_DOWN_VALU)&&(PressDnFlag == 0)&&(EnPressFlag == 1))	//设置气压标志，备份变化前的数据,并且气压检测传感器打开
 			{
 				PressDnFlag = 1;
 				ColorRadioDnBak();  //记录当前光亮度，用于渐暗渐亮
@@ -193,13 +186,5 @@ void GetPressure(void)
 //开机记录初始值
 void GetInitPressure(void)
 {
-	u8 i = 0;
-	PressSum = 0;
-	for(i=0;i<10;i++)
-	{
-		PressSum = PressSum + bmp280Convert(); 
-	}		
-	PressSumInitValu = PressSum/10;
-	PressSumInitValu = PressSumInitValu>>4;	//去掉4位精度
+	PressSumInitValu = PressCurrent;
 }
- //    USART_SendData(HTCFG_USART, (u8)T);

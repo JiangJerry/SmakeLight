@@ -81,7 +81,7 @@ void EVWUP_IRQHandler(void)
 void WaitWakeUpKeyReset(void)
 {
 	while(GPIO_ReadInBit(HT_GPIOB,KEY_PIN) == SET);			//µÈ´ý°´¼üÌ§Æð
-	OldSta[0] = 2;
+	OldSta[0] = SET;
 }
 
 void EnterSleep(void)
