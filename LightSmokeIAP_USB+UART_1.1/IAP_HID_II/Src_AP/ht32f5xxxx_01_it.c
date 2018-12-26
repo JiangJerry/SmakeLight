@@ -82,7 +82,7 @@ void SysTick_Handler(void)
             EnterSleepDly = 0;
     }
 	CntLEDScan++;
-	if(CntLEDScan >= 4)	//客户要求的扫描时间
+	if(CntLEDScan >= 4)	    //客户要求的扫描时间
 	{
 		SFlag = 1;
 		TaskLEDLineRdy = 1; //LED扫描任务就绪

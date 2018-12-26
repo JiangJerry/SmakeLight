@@ -23,6 +23,7 @@ void BatManageInit(void)
     GPIO_WriteOutBits(LED_VCC_EN_PORT,LED_VCC_EN_PIN, RESET);	   
 
     HT32F_DVB_PBInit(DC_CHARGE, BUTTON_MODE_EXTI);              //充电检测中断输入
+    HT32F_DVB_PBInit(DC_STDBY, BUTTON_MODE_EXTI);              //充电检测中断输入
     HT32F_DVB_PBInit(BUTTON_WAKEUP, BUTTON_MODE_EXTI);          //按键中断输入
 }
 
